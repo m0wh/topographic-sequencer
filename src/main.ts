@@ -4,7 +4,8 @@ import bdSample from 'url:./kit/kick.wav'
 import sdSample from 'url:./kit/snare.wav'
 import hhSample from 'url:./kit/hat_close.wav'
 
-const playBtn = document.querySelector('button.play')
+const playBtn = document.querySelector('.transport .play')
+const bpmInput = document.querySelector('.transport #bpm') as HTMLInputElement
 const xSlider = document.querySelector('.form #x') as HTMLInputElement
 const ySlider = document.querySelector('.form #y') as HTMLInputElement
 const bdFillSlider = document.querySelector('.form #bd-fill') as HTMLInputElement
@@ -99,6 +100,8 @@ updateView(0)
 
 xSlider.value = options.x + ''
 xSlider.addEventListener('change', (e) => { options.x = parseInt(xSlider.value) })
+bpmInput.value = Tone.Transport.bpm.value + ''
+bpmInput.addEventListener('change', (e) => { Tone.Transport.bpm.value = parseInt(bpmInput.value) })
 ySlider.value = options.y + ''
 ySlider.addEventListener('change', (e) => { options.y = parseInt(ySlider.value) })
 bdFillSlider.value = 255 - instruments[0].fill + ''
