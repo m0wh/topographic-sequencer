@@ -8,16 +8,18 @@ body {
       &__name {
         display: inline-block;
         font-size: 12px;
-        width: 50px;
+        width: 30px;
         margin: 0;
       }
 
       &__steps {
-        display: inline-block;
+        display: inline-flex;
+        justify-content: stretch;
+        width: calc(100vw - 60px);
+        background-color: #eee;
 
         .step {
-          display: inline-block;
-          width: 20px;
+          width: calc(100% / 32);
           height: 20px;
           border: 1px solid #fff;
           background-color: #eee;
@@ -31,12 +33,17 @@ body {
   }
 
   .form {
-    margin-top: 50px;
+    margin: 50px 0 30px;
     
     label {
       display: inline-block;
       width: 50px;
       font-size: 12px;
+    }
+
+    input {
+      width: calc(100vw - 100px);
+      max-width: 400px;
     }
   }
 }

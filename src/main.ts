@@ -4,6 +4,13 @@ import bdSample from 'url:./kit/kick.wav'
 import sdSample from 'url:./kit/snare.wav'
 import hhSample from 'url:./kit/hat_close.wav'
 
+const playBtn = document.querySelector('button.play')
+const xSlider = document.querySelector('.form #x') as HTMLInputElement
+const ySlider = document.querySelector('.form #y') as HTMLInputElement
+const bdFillSlider = document.querySelector('.form #bd-fill') as HTMLInputElement
+const sdFillSlider = document.querySelector('.form #sd-fill') as HTMLInputElement
+const hhFillSlider = document.querySelector('.form #hh-fill') as HTMLInputElement
+
 function lerp (start: number, end: number, amt: number): number { return (1 - amt) * start + amt * end }
 // function scale (number: number, inMin: number, inMax: number, outMin: number, outMax: number): number { return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin }
 
@@ -38,6 +45,8 @@ const options = {
   y: 235
 }
 
+let currentStep = 0
+
 const sampler = new Tone.Sampler({
   urls: {
     C1: instruments[0].audio,
@@ -45,26 +54,37 @@ const sampler = new Tone.Sampler({
     E1: instruments[2].audio
   },
   onload: () => {
-    Tone.start()
-    Tone.Transport.start()
+    playBtn.textContent = '▶'
+    playBtn.addEventListener('click', () => { Tone.start() }, { once: true })
+    playBtn.addEventListener('click', () => {
+      if (Tone.Transport.state === 'stopped') {
+        currentStep = 0
+        Tone.Transport.start()
+        playBtn.textContent = '■'
+      } else {
+        currentStep = 0
+        Tone.Transport.stop()
+        playBtn.textContent = '▶'
+        updateView(0)
+      }
+    })
   }
 }).toDestination()
 
 Tone.Transport.bpm.value = 120
 Tone.Transport.swing = 0
 
-let s = 0
 Tone.Transport.scheduleRepeat((time) => {
   instruments.forEach((instrument, i) => {
-    const level = readPattern(options.x, options.y, s, i)
+    const level = readPattern(options.x, options.y, currentStep, i)
     if (level > instrument.fill) {
       sampler.triggerAttack(instrument.note, time, level > 192 ? 1 : 0.6)
     }
   })
 
-  updateView(s)
+  updateView(currentStep)
 
-  s = (s + 1) % 32
+  currentStep = (currentStep + 1) % 32
 }, '32n')
 
 function updateView (currentStep) {
@@ -77,18 +97,13 @@ function updateView (currentStep) {
 }
 updateView(0)
 
-const xSlider = document.querySelector('.form #x') as HTMLInputElement
 xSlider.value = options.x + ''
 xSlider.addEventListener('change', (e) => { options.x = parseInt(xSlider.value) })
-const ySlider = document.querySelector('.form #y') as HTMLInputElement
 ySlider.value = options.y + ''
 ySlider.addEventListener('change', (e) => { options.y = parseInt(ySlider.value) })
-const bdFillSlider = document.querySelector('.form #bd-fill') as HTMLInputElement
 bdFillSlider.value = 255 - instruments[0].fill + ''
 bdFillSlider.addEventListener('change', (e) => { instruments[0].fill = 255 - parseInt(bdFillSlider.value) })
-const sdFillSlider = document.querySelector('.form #sd-fill') as HTMLInputElement
 sdFillSlider.value = 255 - instruments[1].fill + ''
 sdFillSlider.addEventListener('change', (e) => { instruments[1].fill = 255 - parseInt(sdFillSlider.value) })
-const hhFillSlider = document.querySelector('.form #hh-fill') as HTMLInputElement
 hhFillSlider.value = 255 - instruments[2].fill + ''
 hhFillSlider.addEventListener('change', (e) => { instruments[2].fill = 255 - parseInt(hhFillSlider.value) })
